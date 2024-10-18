@@ -1,7 +1,23 @@
-<h1 mat-dialog-title>{{ data.label }}</h1>
+<!-- <div
+  class="card"
+  [ngClass]="{ flip: isFlipped }"
+  (click)="isFlipped = !isFlipped"
+>
+  <mat-card class="front-card">
+    <p class="front-title">{{ jobs[0].jobTitle }}</p>
+    <img src="assets/placeholder.jpg" alt="placeholder image" />
+    <p class="front-location">{{ jobs[0].jobLocation }}</p>
+  </mat-card>
+  <mat-card class="back-card">
+    <p class="back-title">Job Details:</p>
+    <p></p>
+  </mat-card>
+</div> -->
+
+<h1 mat-dialog-title>Location Info</h1>
 <div mat-dialog-content>
-  <p>You clicked on the pin for {{ data.label }}.</p>
+  <p>{{ data.info }}</p>
 </div>
 <div mat-dialog-actions>
-  <button mat-button mat-dialog-close>Close</button>
+  <button mat-button (click)="closeDialog()">Close</button>
 </div>

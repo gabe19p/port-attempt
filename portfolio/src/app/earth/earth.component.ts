@@ -7,11 +7,13 @@ import {
 } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { PinDialogComponent } from '../pin-dialog/pin-dialog.component';
 
 @Component({
   selector: 'app-earth',
   standalone: true,
-  imports: [],
+  imports: [MatDialogModule],
   templateUrl: './earth.component.html',
   styleUrls: ['./earth.component.scss'],
 })
@@ -22,22 +24,63 @@ export class EarthComponent implements OnInit, AfterViewInit {
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
-  private earthGroup!: THREE.Mesh;
+  private earthGroup!: THREE.Group;
   private earthMesh!: THREE.Mesh;
   private lightsMesh!: THREE.Mesh;
   private cloudsMesh!: THREE.Mesh;
   private glowMesh!: THREE.Mesh;
+  private flashSpeed: number = 0.05; // Speed of the flashing
+  private maxFlashIntensity: number = 1.0; // Maximum color intensity
+  private minFlashIntensity: number = 0.3; // Minimum color intensity
+  private flashDirection: number = 1; // Direction of the intensity change
+  private raycaster: THREE.Raycaster = new THREE.Raycaster();
+  private mouse: THREE.Vector2 = new THREE.Vector2();
 
-  constructor() {
+  constructor(private dialog: MatDialog) {
     this.getStarfield();
     this.getFresnelMat();
   }
 
-  ngOnInit(): void {}
+  openDialog(info: string): void {
+    this.dialog.open(PinDialogComponent, {
+      data: { info },
+    });
+  }
+
+  ngOnInit(): void {
+    window.addEventListener('click', (event) => this.onClick(event));
+  }
 
   ngAfterViewInit(): void {
     this.initThreeJS();
     this.animate();
+  }
+
+  onClick(event: MouseEvent): void {
+    // Convert mouse coordinates to normalized device coordinates
+    this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Update the raycaster with the camera and mouse position
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+
+    // Calculate objects intersecting the picking ray
+    const intersects = this.raycaster.intersectObjects(
+      this.earthGroup.children
+    );
+
+    if (intersects.length > 0) {
+      const intersectedPin = intersects[0].object;
+
+      // Check if the clicked object is a pin (you might need to adjust this based on how you're structuring your objects)
+      if (
+        intersectedPin instanceof THREE.Mesh &&
+        intersectedPin.name.startsWith('pin_')
+      ) {
+        const locationData = intersectedPin.userData; // Assuming you set userData on the pin mesh
+        this.openDialog(locationData['info']); // Open the dialog with the specific info
+      }
+    }
   }
 
   initThreeJS(): void {
@@ -60,16 +103,17 @@ export class EarthComponent implements OnInit, AfterViewInit {
       0.1,
       1000
     );
-    this.camera.position.z = 5;
+    this.camera.position.z = 3;
 
     // Controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
 
-    // Earth Group
-    const earthGroup = new THREE.Group(); // create a group to hold all the meshes
-    this.scene.add(earthGroup);
-    earthGroup.rotation.z = (-12.4 * Math.PI) / 180;
+    // Earth
+    // Group
+    this.earthGroup = new THREE.Group(); // create a group to hold all the meshes
+    this.scene.add(this.earthGroup);
+    this.earthGroup.rotation.z = (-12.4 * Math.PI) / 180;
     const detail = 12;
     const loader = new THREE.TextureLoader();
     const geometry = new THREE.IcosahedronGeometry(1, detail);
@@ -78,14 +122,14 @@ export class EarthComponent implements OnInit, AfterViewInit {
       map: loader.load('assets/textures/8081_earthmap10k.jpg'),
     });
     this.earthMesh = new THREE.Mesh(geometry, earthMat);
-    earthGroup.add(this.earthMesh);
+    this.earthGroup.add(this.earthMesh);
     // nightime earth
     const lightsMat = new THREE.MeshBasicMaterial({
       map: loader.load('assets/textures/8081_earthlights10k.jpg'),
       blending: THREE.AdditiveBlending,
     });
     this.lightsMesh = new THREE.Mesh(geometry, lightsMat);
-    earthGroup.add(this.lightsMesh);
+    this.earthGroup.add(this.lightsMesh);
     // clouds on earth
     const cloudsMat = new THREE.MeshStandardMaterial({
       map: loader.load('assets/textures/clouds.jpg'),
@@ -94,20 +138,24 @@ export class EarthComponent implements OnInit, AfterViewInit {
       blending: THREE.AdditiveBlending,
     });
     this.cloudsMesh = new THREE.Mesh(geometry, cloudsMat);
-    this.cloudsMesh.scale.setScalar(1.003);
-    earthGroup.add(this.cloudsMesh);
+    this.cloudsMesh.scale.setScalar(1.005);
+    this.earthGroup.add(this.cloudsMesh);
     // glow on earth
     const fresnelMat = this.getFresnelMat();
     this.glowMesh = new THREE.Mesh(geometry, fresnelMat);
     this.glowMesh.scale.setScalar(1.01);
-    earthGroup.add(this.glowMesh);
+    this.earthGroup.add(this.glowMesh);
 
+    // map
+    // pins
+    // Create and add the map pin to the earthGroup
+    this.addMapPins();
+
+    // scene
     // lighting
     const stars = this.getStarfield({ numStars: 2000 });
     this.scene.add(stars);
-
     const sunLight = new THREE.DirectionalLight(0xffffff, 1.8);
-    // sunLight.position.set(-1, 0.5, 1.5);
     sunLight.position.set(-3, 2, 5);
     this.scene.add(sunLight);
 
@@ -118,10 +166,8 @@ export class EarthComponent implements OnInit, AfterViewInit {
   animate(): void {
     requestAnimationFrame(() => this.animate());
 
-    // Rotate the Earth
-    this.earthMesh.rotation.y += 0.002;
-    this.lightsMesh.rotation.y += 0.002;
-    this.cloudsMesh.rotation.y += 0.003;
+    this.earthGroup.rotation.y += 0.002;
+    this.cloudsMesh.rotation.y += 0.0;
 
     // Update controls
     this.controls.update();
@@ -226,4 +272,125 @@ export class EarthComponent implements OnInit, AfterViewInit {
     });
     return fresnelMat;
   }
+
+  addMapPins(): void {
+    const locations = [
+      {
+        lat: 30.7416,
+        lon: 180,
+        info: { jobTitle: 'IT Apprentice', jobLocation: 'Biloxi, Mississippi' },
+      }, // Mississippi
+      {
+        lat: 36.257,
+        lon: 171,
+        info: { jobTitle: 'Knowledge Manager', jobLocation: 'Omaha, Nebraska' },
+      }, // Omaha
+      {
+        lat: 12,
+        lon: 310,
+        info: { jobTitle: 'Executive Admin', jobLocation: 'Djibouti, Africa' },
+      }, // Djibouti
+      {
+        lat: 25,
+        lon: 398,
+        info: {
+          jobTitle: 'Data Operations Supervisor',
+          jobLocation: 'Okinawa, Japan',
+        },
+      }, // Okinawa
+    ];
+
+    locations.forEach((location, index) => {
+      const { lat, lon, info } = location;
+
+      // Convert latitude and longitude to radians
+      const latRad = THREE.MathUtils.degToRad(lat);
+      const lonRad = THREE.MathUtils.degToRad(lon);
+
+      // Calculate the position on the sphere
+      const radius = 1.05; // Adjust if needed based on the size of your Earth
+      const x = radius * Math.cos(latRad) * Math.sin(lonRad);
+      const y = radius * Math.sin(latRad);
+      const z = radius * Math.cos(latRad) * Math.cos(lonRad);
+
+      // Create the pin mesh and position it
+      const pinGeometry = new THREE.SphereGeometry(0.02, 16, 16);
+      const pinMaterial = new THREE.MeshBasicMaterial({ color: 0xf30000 });
+      const pin = new THREE.Mesh(pinGeometry, pinMaterial);
+      pin.name = `pin_${index}`; // Give the pin a unique name
+      pin.userData = { info }; // Attach info to userData
+      // Rotate the cone to point upwards
+
+      // Create a larger sphere for the glow effect
+      const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        transparent: true,
+        opacity: 0.5, // Lower opacity for a softer glow
+      });
+      const glow1 = new THREE.Mesh(
+        new THREE.SphereGeometry(0.03, 16, 16), // Increase the segments for a smoother sphere
+        glowMaterial
+      );
+      const glow2 = new THREE.Mesh(
+        new THREE.SphereGeometry(0.04, 16, 16), // Increase the segments for a smoother sphere
+        glowMaterial
+      );
+
+      pin.position.set(x, y, z);
+      glow1.position.set(x, y, z);
+      glow2.position.set(x, y, z);
+
+      this.earthGroup.add(pin); // Add pin to the earthGroup
+      this.earthGroup.add(glow1); // Add the glow behind the pin
+      this.earthGroup.add(glow2); // Add the glow behind the pin
+
+      // Start the flashing effect for both the pin and the glow meshes
+      // this.startFlashing(pin, glow1, glow2);
+    });
+  }
+
+  // startFlashing(pin: THREE.Mesh, glow1: THREE.Mesh, glow2: THREE.Mesh): void {
+  //   const animate = () => {
+  //     // Type assertion to ensure pin.material is a MeshBasicMaterial
+  //     const pinMaterial = pin.material as THREE.MeshBasicMaterial;
+  //     const glowMaterial1 = glow1.material as THREE.MeshBasicMaterial;
+  //     const glowMaterial2 = glow2.material as THREE.MeshBasicMaterial;
+
+  //     // Update the pin color intensity based on the direction
+  //     pinMaterial.color.r =
+  //       this.flashDirection > 0
+  //         ? Math.min(
+  //             pinMaterial.color.r + this.flashSpeed,
+  //             this.maxFlashIntensity
+  //           )
+  //         : Math.max(
+  //             pinMaterial.color.r - this.flashSpeed,
+  //             this.minFlashIntensity
+  //           );
+
+  //     // Update the glow opacity
+  //     glowMaterial1.opacity =
+  //       this.flashDirection > 0
+  //         ? Math.min(glowMaterial1.opacity + this.flashSpeed * 0.2, 0.4) // Adjust glow intensity
+  //         : Math.max(glowMaterial1.opacity - this.flashSpeed * 0.2, 0.1); // Adjust glow intensity
+
+  //     glowMaterial2.opacity =
+  //       this.flashDirection > 0
+  //         ? Math.min(glowMaterial2.opacity + this.flashSpeed * 0.2, 0.4)
+  //         : Math.max(glowMaterial2.opacity - this.flashSpeed * 0.2, 0.1);
+
+  //     // Reverse the direction if the intensity reaches max or min
+  //     if (pinMaterial.color.r >= this.maxFlashIntensity) {
+  //       this.flashDirection = -1; // Start fading out
+  //     } else if (pinMaterial.color.r <= this.minFlashIntensity) {
+  //       this.flashDirection = 1; // Start flashing in
+  //     }
+
+  //     // Update the color and request the next frame
+  //     requestAnimationFrame(animate);
+  //   };
+
+  //   // Start the animation loop
+  //   animate();
+  // }
 }
