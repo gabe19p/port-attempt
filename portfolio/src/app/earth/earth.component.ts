@@ -122,9 +122,13 @@ export class EarthComponent implements OnInit, AfterViewInit {
     );
     this.camera.position.z = 3;
 
+    // Area
     // Controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
+    // Set min and max distance for zoom
+    this.controls.minDistance = 2; // Minimum distance to the globe
+    this.controls.maxDistance = 4; // Optional: Maximum distance from the globe
 
     // Earth
     // Group
