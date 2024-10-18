@@ -1,50 +1,62 @@
-// mat-card {
-//   padding: 20px 0;
-//   width: 30vw;
-//   height: 60vh;
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-around;
-// }
-
 img {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
 }
+
+.card-container {
+  perspective: 1000px; /* This enables the 3D effect */
+  overflow: hidden;
+  width: 350px;
+  height: 600px;
+  background-color: rgba(0, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 10px 10px 10px rgba(0, 0, 0, 1); /* Add box shadow */
+}
+
 .card {
-  width: 30vw; // Adjust width as necessary
-  height: 60vh; // Adjust height as necessary
-  perspective: 1000px; // This enables the 3D effect
+  width: 300px; /* Adjust width as necessary */
+  height: 500px; /* Adjust height as necessary */
+  position: relative; /* Ensure child elements are positioned correctly */
+  transform-style: preserve-3d; /* Preserve 3D transformation for children */
+  transition: transform 0.6s; /* Transition effect */
+}
 
-  // Card flipping styles
-  .front-card,
-  .back-card {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden; // Prevents back side from showing
-    border: 1px solid #ccc; // Optional border for the cards
-    border-radius: 10px; // Optional rounded corners
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.6s; // Transition effect
-  }
+.front-card,
+.back-card {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden; /* Prevents back side from showing */
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  transition: transform 0.6s; /* Transition effect */
+  border: 1px solid rgba(255, 255, 255, 1); /* Optional border with transparency */
+  border-radius: 10px; /* Optional rounded corners */
+  background-color: rgba(
+    255,
+    255,
+    255,
+    1
+  ); /* Transparent background for front and back */
+  box-shadow: 0px 0px 20px rgba(255, 255, 255, 1); /* Add box shadow */
+}
 
-  .front-card {
-    background-color: #fff; // Front card color
-  }
+.front-card {
+  /* Additional styles for front card */
+}
 
-  .back-card {
-    background-color: #f1f1f1; // Back card color
-    transform: rotateY(180deg); // Initial position
-  }
+.back-card {
+  transform: rotateY(180deg); /* Initial position */
+}
 
-  &.flip .front-card {
-    transform: rotateY(180deg); // Rotate front card when flipped
-  }
+.card.flip {
+  transform: rotateY(180deg); /* Flip the card */
+}
 
-  &.flip .back-card {
-    transform: rotateY(0); // Show back card when flipped
-  }
+.mat-dialog-container {
+  background: transparent !important;
+  box-shadow: none !important;
 }

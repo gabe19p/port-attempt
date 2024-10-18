@@ -44,22 +44,6 @@ export class EarthComponent implements OnInit, AfterViewInit {
     this.getFresnelMat();
   }
 
-  // openDialog(locationData: WorkInfo): void {
-  //   if (!this.dialogOpen) {
-  //     // Check if the dialog is not already open
-  //     this.dialogOpen = true; // Set flag to true when the dialog opens
-
-  //     // Declare dialogRef here
-  //     const dialogRef = this.dialog.open(PinDialogComponent, {
-  //       data: locationData,
-  //     });
-
-  //     // Reset dialogOpen to false when the dialog is closed
-  //     dialogRef.afterClosed().subscribe(() => {
-  //       this.dialogOpen = false; // Reset the flag
-  //     });
-  //   }
-  // }
   openDialog(info: string): void {
     if (!this.dialogOpen) {
       // Check if the dialog is not already open

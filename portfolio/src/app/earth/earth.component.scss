@@ -1,5 +1,26 @@
+// font-family: "Barrio", system-ui;
+
+.main-container {
+  font-family: "Rubik Spray Paint", system-ui;
+  position: relative;
+  display: flex;
+}
+
 canvas {
   width: 100%;
   height: 100%;
   display: block;
+  z-index: 1;
+}
+
+p {
+  position: absolute; /* Positioning it absolutely */
+  z-index: 10; /* Ensures it is above the canvas */
+  color: white;
+  top: 80%; /* Position it in the middle vertically */
+  left: 50%; /* Position it in the middle horizontally */
+  transform: translate(-50%, -50%); /* Adjust for the element's own size */
+  text-align: center; /* Center the text within the paragraph */
+  font-size: 96px;
+  text-shadow: 0px 5px 10px rgba(255, 255, 255, 0.5); /* Add text shadow */
 }

@@ -1,37 +1,17 @@
-<!-- <div
-  class="card"
-  [ngClass]="{ flip: isFlipped }"
-  (click)="isFlipped = !isFlipped"
->
-  <mat-card class="front-card">
-    <p class="front-title">{{ jobs[0].jobTitle }}</p>
-    <img src="assets/placeholder.jpg" alt="placeholder image" />
-    <p class="front-location">{{ jobs[0].jobLocation }}</p>
-  </mat-card>
-  <mat-card class="back-card">
-    <p class="back-title">Job Details:</p>
-    <p></p>
-  </mat-card>
-</div> -->
-
-<!-- <h1 mat-dialog-title>Location Info</h1>
-<div mat-dialog-content>
-  <p>{{ data.info }}</p>
-</div>
-<div mat-dialog-actions>
-  <button mat-button (click)="closeDialog()">Close</button>
-</div> -->
-
-<h1 mat-dialog-title>Location Info</h1>
-<div mat-dialog-content>
-  <p *ngIf="data.info">
-    <!-- Assuming data.info has 'title' and 'description' properties -->
-    <strong>Title:</strong> {{ data.info.jobTitle }}<br />
-    <strong>Description:</strong> {{ data.info.jobLocation }}
-  </p>
-  <img [src]="data.info.image" alt="" />
-  <p *ngIf="!data.info">No information available.</p>
-</div>
-<div mat-dialog-actions>
-  <button mat-button (click)="closeDialog()">Close</button>
+<div class="card-container">
+  <div
+    class="card"
+    [ngClass]="{ flip: isFlipped }"
+    (click)="isFlipped = !isFlipped"
+  >
+    <mat-card class="front-card">
+      <p class="front-title">{{ data.info.jobTitle }}</p>
+      <img [src]="data.info.image" alt="location specific patch" />
+      <p class="front-location">{{ data.info.jobLocation }}</p>
+    </mat-card>
+    <mat-card class="back-card">
+      <p class="back-title">Job Details:</p>
+      <p></p>
+    </mat-card>
+  </div>
 </div>
