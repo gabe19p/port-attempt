@@ -13,15 +13,17 @@ import { WorkInfo } from '../models/work-info';
   styleUrl: './pin-dialog.component.scss',
 })
 export class PinDialogComponent {
+  constructor() {}
+  // uncomment to use dynamic data!
   // constructor will take the date from the pin that is clicked
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { info: WorkInfo },
-    public dialogRef: MatDialogRef<PinDialogComponent>
-  ) {}
+  // constructor(
+  //   @Inject(MAT_DIALOG_DATA) public data: { info: WorkInfo },
+  //   public dialogRef: MatDialogRef<PinDialogComponent>
+  // ) {}
 
-  closeDialog(): void {
-    this.dialogRef.close();
-  }
+  // closeDialog(): void {
+  //   this.dialogRef.close();
+  // }
 
   isFlipped = false;
 
@@ -30,6 +32,7 @@ export class PinDialogComponent {
       jobNumber: 1,
       jobTitle: 'Knowledge Manager',
       jobLocation: 'Omaha, Nebraska',
+      image: 'assets/patches/55th.jpg',
     },
   ];
 
