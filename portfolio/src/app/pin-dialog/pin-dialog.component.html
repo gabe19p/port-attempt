@@ -14,9 +14,23 @@
   </mat-card>
 </div> -->
 
-<h1 mat-dialog-title>Location Info</h1>
+<!-- <h1 mat-dialog-title>Location Info</h1>
 <div mat-dialog-content>
   <p>{{ data.info }}</p>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="closeDialog()">Close</button>
+</div> -->
+
+<h1 mat-dialog-title>Location Info</h1>
+<div mat-dialog-content>
+  <p *ngIf="data.info">
+    <!-- Assuming data.info has 'title' and 'description' properties -->
+    <strong>Title:</strong> {{ data.info.jobTitle }}<br />
+    <strong>Description:</strong> {{ data.info.jobLocation }}
+  </p>
+  <img [src]="data.info.image" alt="" />
+  <p *ngIf="!data.info">No information available.</p>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="closeDialog()">Close</button>

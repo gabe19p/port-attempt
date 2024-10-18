@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { PinDialogData } from '../models/pin-dialog-data'; // set the label type so the earth.ts can read the label
+import { WorkInfo } from '../models/work-info';
 
 @Component({
   selector: 'app-pin-dialog',
@@ -14,7 +15,7 @@ import { PinDialogData } from '../models/pin-dialog-data'; // set the label type
 export class PinDialogComponent {
   // constructor will take the date from the pin that is clicked
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { info: string },
+    @Inject(MAT_DIALOG_DATA) public data: { info: WorkInfo },
     public dialogRef: MatDialogRef<PinDialogComponent>
   ) {}
 

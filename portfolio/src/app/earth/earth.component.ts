@@ -8,7 +8,9 @@ import {
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PinDialogComponent } from '../pin-dialog/pin-dialog.component';
+import { WorkInfo } from '../models/work-info';
 
 @Component({
   selector: 'app-earth',
@@ -35,16 +37,45 @@ export class EarthComponent implements OnInit, AfterViewInit {
   private flashDirection: number = 1; // Direction of the intensity change
   private raycaster: THREE.Raycaster = new THREE.Raycaster();
   private mouse: THREE.Vector2 = new THREE.Vector2();
+  private dialogOpen: boolean = false; // Flag to track dialog state
 
   constructor(private dialog: MatDialog) {
     this.getStarfield();
     this.getFresnelMat();
   }
 
+  // openDialog(locationData: WorkInfo): void {
+  //   if (!this.dialogOpen) {
+  //     // Check if the dialog is not already open
+  //     this.dialogOpen = true; // Set flag to true when the dialog opens
+
+  //     // Declare dialogRef here
+  //     const dialogRef = this.dialog.open(PinDialogComponent, {
+  //       data: locationData,
+  //     });
+
+  //     // Reset dialogOpen to false when the dialog is closed
+  //     dialogRef.afterClosed().subscribe(() => {
+  //       this.dialogOpen = false; // Reset the flag
+  //     });
+  //   }
+  // }
   openDialog(info: string): void {
-    this.dialog.open(PinDialogComponent, {
-      data: { info },
-    });
+    if (!this.dialogOpen) {
+      // Check if the dialog is not already open
+      this.dialogOpen = true; // Set flag to true when the dialog opens
+      console.log(info);
+
+      // Declare dialogRef here
+      const dialogRef = this.dialog.open(PinDialogComponent, {
+        data: { info },
+      });
+
+      // Reset dialogOpen to false when the dialog is closed
+      dialogRef.afterClosed().subscribe(() => {
+        this.dialogOpen = false; // Reset the flag
+      });
+    }
   }
 
   ngOnInit(): void {
@@ -69,15 +100,17 @@ export class EarthComponent implements OnInit, AfterViewInit {
       this.earthGroup.children
     );
 
+    console.log('Intersects:', intersects); // Debugging line
+
     if (intersects.length > 0) {
-      const intersectedPin = intersects[0].object;
+      const intersectedObject = intersects[0].object;
+      console.log('Intersected Pin:', intersectedObject); // Debugging line
 
       // Check if the clicked object is a pin (you might need to adjust this based on how you're structuring your objects)
-      if (
-        intersectedPin instanceof THREE.Mesh &&
-        intersectedPin.name.startsWith('pin_')
-      ) {
-        const locationData = intersectedPin.userData; // Assuming you set userData on the pin mesh
+      // Check if the clicked object is a click box
+      if (intersectedObject.name.startsWith('clickBox_')) {
+        console.log('YOU DID IT!');
+        const locationData = intersectedObject.userData; // Access userData from the click box
         this.openDialog(locationData['info']); // Open the dialog with the specific info
       }
     }
@@ -155,8 +188,8 @@ export class EarthComponent implements OnInit, AfterViewInit {
     // lighting
     const stars = this.getStarfield({ numStars: 2000 });
     this.scene.add(stars);
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.8);
-    sunLight.position.set(-3, 2, 5);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.15);
+    sunLight.position.set(-2, 2, 5);
     this.scene.add(sunLight);
 
     // Resize listener
@@ -166,8 +199,8 @@ export class EarthComponent implements OnInit, AfterViewInit {
   animate(): void {
     requestAnimationFrame(() => this.animate());
 
-    this.earthGroup.rotation.y += 0.002;
-    this.cloudsMesh.rotation.y += 0.0;
+    this.earthGroup.rotation.y += 0.0002;
+    this.cloudsMesh.rotation.y += 0.0004;
 
     // Update controls
     this.controls.update();
@@ -278,17 +311,29 @@ export class EarthComponent implements OnInit, AfterViewInit {
       {
         lat: 30.7416,
         lon: 180,
-        info: { jobTitle: 'IT Apprentice', jobLocation: 'Biloxi, Mississippi' },
+        info: {
+          jobTitle: 'IT Apprentice',
+          jobLocation: 'Biloxi, Mississippi',
+          image: 'assets/patches/336th.png',
+        },
       }, // Mississippi
       {
         lat: 36.257,
         lon: 171,
-        info: { jobTitle: 'Knowledge Manager', jobLocation: 'Omaha, Nebraska' },
+        info: {
+          jobTitle: 'Knowledge Manager',
+          jobLocation: 'Omaha, Nebraska',
+          image: 'assets/patches/55th.jpg',
+        },
       }, // Omaha
       {
         lat: 12,
         lon: 310,
-        info: { jobTitle: 'Executive Admin', jobLocation: 'Djibouti, Africa' },
+        info: {
+          jobTitle: 'Executive Admin',
+          jobLocation: 'Djibouti, Africa',
+          image: 'assets/patches/449th.PNG',
+        },
       }, // Djibouti
       {
         lat: 25,
@@ -296,6 +341,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
         info: {
           jobTitle: 'Data Operations Supervisor',
           jobLocation: 'Okinawa, Japan',
+          image: 'assets/patches/390th.png',
         },
       }, // Okinawa
     ];
@@ -308,7 +354,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
       const lonRad = THREE.MathUtils.degToRad(lon);
 
       // Calculate the position on the sphere
-      const radius = 1.05; // Adjust if needed based on the size of your Earth
+      const radius = 1.04; // Adjust if needed based on the size of your Earth
       const x = radius * Math.cos(latRad) * Math.sin(lonRad);
       const y = radius * Math.sin(latRad);
       const z = radius * Math.cos(latRad) * Math.cos(lonRad);
@@ -319,7 +365,18 @@ export class EarthComponent implements OnInit, AfterViewInit {
       const pin = new THREE.Mesh(pinGeometry, pinMaterial);
       pin.name = `pin_${index}`; // Give the pin a unique name
       pin.userData = { info }; // Attach info to userData
-      // Rotate the cone to point upwards
+
+      // Create a larger sphere for the clickable area
+      const clickBoxGeometry = new THREE.SphereGeometry(0.3, 16, 16); // Larger radius for the click box
+      const clickBoxMaterial = new THREE.MeshBasicMaterial({
+        color: 0x333333,
+        transparent: true,
+        opacity: 0,
+      }); // Invisible
+      const clickBox = new THREE.Mesh(clickBoxGeometry, clickBoxMaterial);
+      clickBox.position.set(x, y - 0.1, z);
+      clickBox.userData = { info }; // Attach the same info for dialog purposes
+      clickBox.name = `clickBox_${index}`; // Unique name for click box
 
       // Create a larger sphere for the glow effect
       const glowMaterial = new THREE.MeshBasicMaterial({
@@ -341,7 +398,8 @@ export class EarthComponent implements OnInit, AfterViewInit {
       glow2.position.set(x, y, z);
 
       this.earthGroup.add(pin); // Add pin to the earthGroup
-      this.earthGroup.add(glow1); // Add the glow behind the pin
+      this.earthGroup.add(clickBox); // Add pin to the earthGroup
+      // this.earthGroup.add(glow1); // Add the glow behind the pin
       this.earthGroup.add(glow2); // Add the glow behind the pin
 
       // Start the flashing effect for both the pin and the glow meshes
