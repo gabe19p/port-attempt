@@ -142,6 +142,9 @@ export class EarthComponent implements OnInit, AfterViewInit {
     // daytime earth
     const earthMat = new THREE.MeshPhongMaterial({
       map: loader.load('assets/textures/8081_earthmap10k.jpg'),
+      specularMap: loader.load('assets/textures/8081_earthspec10k.jpg'),
+      bumpMap: loader.load('assets/textures/8081_earthbump10k.jpg'),
+      bumpScale: 50,
     });
     this.earthMesh = new THREE.Mesh(geometry, earthMat);
     this.earthGroup.add(this.earthMesh);
@@ -177,8 +180,8 @@ export class EarthComponent implements OnInit, AfterViewInit {
     // lighting
     const stars = this.getStarfield({ numStars: 2000 });
     this.scene.add(stars);
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.15);
-    sunLight.position.set(-2, 2, 1);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    sunLight.position.set(3, 4, 1);
     this.scene.add(sunLight);
 
     // Resize listener
