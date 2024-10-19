@@ -121,6 +121,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
       1000
     );
     this.camera.position.z = 3;
+    this.camera.position.y = 1.5;
 
     // Area
     // Controls
@@ -134,7 +135,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
     // Group
     this.earthGroup = new THREE.Group(); // create a group to hold all the meshes
     this.scene.add(this.earthGroup);
-    this.earthGroup.rotation.z = (-12.4 * Math.PI) / 180;
+    this.earthGroup.rotation.z = (-10 * Math.PI) / 180;
     const detail = 12;
     const loader = new THREE.TextureLoader();
     const geometry = new THREE.IcosahedronGeometry(1, detail);
@@ -177,7 +178,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
     const stars = this.getStarfield({ numStars: 2000 });
     this.scene.add(stars);
     const sunLight = new THREE.DirectionalLight(0xffffff, 1.15);
-    sunLight.position.set(-2, 2, 5);
+    sunLight.position.set(-2, 2, 1);
     this.scene.add(sunLight);
 
     // Resize listener
@@ -187,8 +188,8 @@ export class EarthComponent implements OnInit, AfterViewInit {
   animate(): void {
     requestAnimationFrame(() => this.animate());
 
-    this.earthGroup.rotation.y += 0.0002;
-    this.cloudsMesh.rotation.y += 0.0004;
+    this.cloudsMesh.rotation.y += -0.001; // negative number to make clouds slower
+    this.earthGroup.rotation.y += 0.002;
 
     // Update controls
     this.controls.update();
@@ -203,7 +204,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
     this.renderer.setPixelRatio(window.devicePixelRatio); // Update pixel ratio on resize
   }
 
-  getStarfield({ numStars = 500 } = {}) {
+  getStarfield({ numStars = 1500 } = {}) {
     function randomSpherePoint() {
       const radius = Math.random() * 25 + 25;
       const u = Math.random();
@@ -294,24 +295,25 @@ export class EarthComponent implements OnInit, AfterViewInit {
     return fresnelMat;
   }
 
+  // map pins as patches & photos
   addMapPins(): void {
     const locations = [
       {
-        lat: 30.7416,
-        lon: 180,
+        lat: 28.7416,
+        lon: 183,
         info: {
           jobTitle: 'IT Apprentice',
           jobLocation: 'Biloxi, Mississippi',
-          image: 'assets/patches/336th.png',
+          image: 'assets/patches/336.png',
         },
       }, // Mississippi
       {
         lat: 36.257,
-        lon: 171,
+        lon: 168,
         info: {
           jobTitle: 'Knowledge Manager',
           jobLocation: 'Omaha, Nebraska',
-          image: 'assets/patches/55th.jpg',
+          image: 'assets/patches/55.png',
         },
       }, // Omaha
       {
@@ -320,7 +322,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
         info: {
           jobTitle: 'Executive Admin',
           jobLocation: 'Djibouti, Africa',
-          image: 'assets/patches/449th.PNG',
+          image: 'assets/patches/449.png',
         },
       }, // Djibouti
       {
@@ -329,7 +331,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
         info: {
           jobTitle: 'Data Operations Supervisor',
           jobLocation: 'Okinawa, Japan',
-          image: 'assets/patches/390th.png',
+          image: 'assets/patches/390.png',
         },
       }, // Okinawa
     ];
@@ -342,101 +344,134 @@ export class EarthComponent implements OnInit, AfterViewInit {
       const lonRad = THREE.MathUtils.degToRad(lon);
 
       // Calculate the position on the sphere
-      const radius = 1.04; // Adjust if needed based on the size of your Earth
+      const radius = 1.1; // Adjust if needed based on the size of your Earth
       const x = radius * Math.cos(latRad) * Math.sin(lonRad);
       const y = radius * Math.sin(latRad);
       const z = radius * Math.cos(latRad) * Math.cos(lonRad);
 
-      // Create the pin mesh and position it
-      const pinGeometry = new THREE.SphereGeometry(0.02, 16, 16);
-      const pinMaterial = new THREE.MeshBasicMaterial({ color: 0xf30000 });
-      const pin = new THREE.Mesh(pinGeometry, pinMaterial);
-      pin.name = `pin_${index}`; // Give the pin a unique name
-      pin.userData = { info }; // Attach info to userData
+      // Load the image for the sprite
+      const texture = new THREE.TextureLoader().load(info.image);
 
-      // Create a larger sphere for the clickable area
-      const clickBoxGeometry = new THREE.SphereGeometry(0.3, 16, 16); // Larger radius for the click box
-      const clickBoxMaterial = new THREE.MeshBasicMaterial({
-        color: 0x333333,
-        transparent: true,
-        opacity: 0,
-      }); // Invisible
-      const clickBox = new THREE.Mesh(clickBoxGeometry, clickBoxMaterial);
-      clickBox.position.set(x, y - 0.1, z);
-      clickBox.userData = { info }; // Attach the same info for dialog purposes
-      clickBox.name = `clickBox_${index}`; // Unique name for click box
+      // Create the sprite material
+      const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+      const sprite = new THREE.Sprite(spriteMaterial);
 
-      // Create a larger sphere for the glow effect
-      const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0xff0000,
-        transparent: true,
-        opacity: 0.5, // Lower opacity for a softer glow
-      });
-      const glow1 = new THREE.Mesh(
-        new THREE.SphereGeometry(0.03, 16, 16), // Increase the segments for a smoother sphere
-        glowMaterial
-      );
-      const glow2 = new THREE.Mesh(
-        new THREE.SphereGeometry(0.04, 16, 16), // Increase the segments for a smoother sphere
-        glowMaterial
-      );
+      // Set the position of the sprite
+      sprite.position.set(x, y, z);
 
-      pin.position.set(x, y, z);
-      glow1.position.set(x, y, z);
-      glow2.position.set(x, y, z);
+      // Scale the sprite to a suitable size
+      sprite.scale.set(0.2, 0.2, 1); // Adjust the size as needed
 
-      this.earthGroup.add(pin); // Add pin to the earthGroup
-      this.earthGroup.add(clickBox); // Add pin to the earthGroup
-      // this.earthGroup.add(glow1); // Add the glow behind the pin
-      this.earthGroup.add(glow2); // Add the glow behind the pin
+      // Ensure the sprite faces outward from the globe's center
+      sprite.lookAt(50, 10, 10);
 
-      // Start the flashing effect for both the pin and the glow meshes
-      // this.startFlashing(pin, glow1, glow2);
+      // Add user data to the sprite for interaction
+      sprite.userData = info;
+
+      // Name the sprite for identification in raycasting
+      sprite.name = `clickBox_${info.jobLocation}`;
+
+      // Add the sprite to the earthGroup
+      this.earthGroup.add(sprite);
     });
   }
 
-  // startFlashing(pin: THREE.Mesh, glow1: THREE.Mesh, glow2: THREE.Mesh): void {
-  //   const animate = () => {
-  //     // Type assertion to ensure pin.material is a MeshBasicMaterial
-  //     const pinMaterial = pin.material as THREE.MeshBasicMaterial;
-  //     const glowMaterial1 = glow1.material as THREE.MeshBasicMaterial;
-  //     const glowMaterial2 = glow2.material as THREE.MeshBasicMaterial;
+  // map pins as read dots
+  // addMapPins(): void {
+  //   const locations = [
+  //     {
+  //       lat: 30.7416,
+  //       lon: 180,
+  //       info: {
+  //         jobTitle: 'IT Apprentice',
+  //         jobLocation: 'Biloxi, Mississippi',
+  //         image: 'assets/patches/336th.png',
+  //       },
+  //     }, // Mississippi
+  //     {
+  //       lat: 36.257,
+  //       lon: 171,
+  //       info: {
+  //         jobTitle: 'Knowledge Manager',
+  //         jobLocation: 'Omaha, Nebraska',
+  //         image: 'assets/patches/55th.jpg',
+  //       },
+  //     }, // Omaha
+  //     {
+  //       lat: 12,
+  //       lon: 310,
+  //       info: {
+  //         jobTitle: 'Executive Admin',
+  //         jobLocation: 'Djibouti, Africa',
+  //         image: 'assets/patches/449th.PNG',
+  //       },
+  //     }, // Djibouti
+  //     {
+  //       lat: 25,
+  //       lon: 398,
+  //       info: {
+  //         jobTitle: 'Data Operations Supervisor',
+  //         jobLocation: 'Okinawa, Japan',
+  //         image: 'assets/patches/390th.png',
+  //       },
+  //     }, // Okinawa
+  //   ];
 
-  //     // Update the pin color intensity based on the direction
-  //     pinMaterial.color.r =
-  //       this.flashDirection > 0
-  //         ? Math.min(
-  //             pinMaterial.color.r + this.flashSpeed,
-  //             this.maxFlashIntensity
-  //           )
-  //         : Math.max(
-  //             pinMaterial.color.r - this.flashSpeed,
-  //             this.minFlashIntensity
-  //           );
+  //   locations.forEach((location, index) => {
+  //     const { lat, lon, info } = location;
 
-  //     // Update the glow opacity
-  //     glowMaterial1.opacity =
-  //       this.flashDirection > 0
-  //         ? Math.min(glowMaterial1.opacity + this.flashSpeed * 0.2, 0.4) // Adjust glow intensity
-  //         : Math.max(glowMaterial1.opacity - this.flashSpeed * 0.2, 0.1); // Adjust glow intensity
+  //     // Convert latitude and longitude to radians
+  //     const latRad = THREE.MathUtils.degToRad(lat);
+  //     const lonRad = THREE.MathUtils.degToRad(lon);
 
-  //     glowMaterial2.opacity =
-  //       this.flashDirection > 0
-  //         ? Math.min(glowMaterial2.opacity + this.flashSpeed * 0.2, 0.4)
-  //         : Math.max(glowMaterial2.opacity - this.flashSpeed * 0.2, 0.1);
+  //     // Calculate the position on the sphere
+  //     const radius = 1.04; // Adjust if needed based on the size of your Earth
+  //     const x = radius * Math.cos(latRad) * Math.sin(lonRad);
+  //     const y = radius * Math.sin(latRad);
+  //     const z = radius * Math.cos(latRad) * Math.cos(lonRad);
 
-  //     // Reverse the direction if the intensity reaches max or min
-  //     if (pinMaterial.color.r >= this.maxFlashIntensity) {
-  //       this.flashDirection = -1; // Start fading out
-  //     } else if (pinMaterial.color.r <= this.minFlashIntensity) {
-  //       this.flashDirection = 1; // Start flashing in
-  //     }
+  //     // Create the pin mesh and position it
+  //     const pinGeometry = new THREE.SphereGeometry(0.02, 16, 16);
+  //     const pinMaterial = new THREE.MeshBasicMaterial({ color: 0xf30000 });
+  //     const pin = new THREE.Mesh(pinGeometry, pinMaterial);
+  //     pin.name = `pin_${index}`; // Give the pin a unique name
+  //     pin.userData = { info }; // Attach info to userData
 
-  //     // Update the color and request the next frame
-  //     requestAnimationFrame(animate);
-  //   };
+  //     // Create a larger sphere for the clickable area
+  //     const clickBoxGeometry = new THREE.SphereGeometry(0.3, 16, 16); // Larger radius for the click box
+  //     const clickBoxMaterial = new THREE.MeshBasicMaterial({
+  //       color: 0x333333,
+  //       transparent: true,
+  //       opacity: 0,
+  //     }); // Invisible
+  //     const clickBox = new THREE.Mesh(clickBoxGeometry, clickBoxMaterial);
+  //     clickBox.position.set(x, y - 0.1, z);
+  //     clickBox.userData = { info }; // Attach the same info for dialog purposes
+  //     clickBox.name = `clickBox_${index}`; // Unique name for click box
 
-  //   // Start the animation loop
-  //   animate();
+  //     // Create a larger sphere for the glow effect
+  //     const glowMaterial = new THREE.MeshBasicMaterial({
+  //       color: 0xff0000,
+  //       transparent: true,
+  //       opacity: 0.5, // Lower opacity for a softer glow
+  //     });
+  //     const glow1 = new THREE.Mesh(
+  //       new THREE.SphereGeometry(0.03, 16, 16), // Increase the segments for a smoother sphere
+  //       glowMaterial
+  //     );
+  //     const glow2 = new THREE.Mesh(
+  //       new THREE.SphereGeometry(0.04, 16, 16), // Increase the segments for a smoother sphere
+  //       glowMaterial
+  //     );
+
+  //     pin.position.set(x, y, z);
+  //     glow1.position.set(x, y, z);
+  //     glow2.position.set(x, y, z);
+
+  //     this.earthGroup.add(pin); // Add pin to the earthGroup
+  //     this.earthGroup.add(clickBox); // Add pin to the earthGroup
+  //     // this.earthGroup.add(glow1); // Add the glow behind the pin
+  //     this.earthGroup.add(glow2); // Add the glow behind the pin
+  //   });
   // }
 }

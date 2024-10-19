@@ -1,3 +1,4 @@
+<!-- this is the pass data code  -->
 <!-- <div class="card-container">
   <div
     class="card"
@@ -16,7 +17,8 @@
   </div>
 </div> -->
 
-<div class="card-container">
+<!-- this is the dumb code -->
+<!-- <div class="card-container">
   <div
     class="card"
     [ngClass]="{ flip: isFlipped }"
@@ -34,4 +36,8 @@
       <p></p>
     </mat-card>
   </div>
-</div>
+</div> -->
+
+<p class="front-title">{{ data.info.jobTitle }}</p>
+<img [src]="data.info.image" alt="location specific patch" />
+<p class="front-location">{{ data.info.jobLocation }}</p>
