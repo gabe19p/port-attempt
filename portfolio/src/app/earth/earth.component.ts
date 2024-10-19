@@ -53,6 +53,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
       // Declare dialogRef here
       const dialogRef = this.dialog.open(PinDialogComponent, {
         data: { info },
+        panelClass: 'dialog-wrapper',
       });
 
       // Reset dialogOpen to false when the dialog is closed
@@ -316,7 +317,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
         lat: 36.257,
         lon: 168,
         info: {
-          jobTitle: 'KNOWLEDGE MANAGER',
+          jobTitle: 'Knowledge Manager',
           jobCompany: '55th Communications Squadron',
           jobLocation: 'Offutt AFB - Omaha, Nebraska',
           jobDates: '2017-2021',
