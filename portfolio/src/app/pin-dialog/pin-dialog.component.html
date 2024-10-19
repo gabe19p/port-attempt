@@ -1,43 +1,24 @@
-<!-- this is the pass data code  -->
-<!-- <div class="card-container">
-  <div
-    class="card"
-    [ngClass]="{ flip: isFlipped }"
-    (click)="isFlipped = !isFlipped"
-  >
-    <mat-card class="front-card">
-      <p class="front-title">{{ data.info.jobTitle }}</p>
-      <img [src]="data.info.image" alt="location specific patch" />
-      <p class="front-location">{{ data.info.jobLocation }}</p>
-    </mat-card>
-    <mat-card class="back-card">
-      <p class="back-title">Job Details:</p>
-      <p></p>
-    </mat-card>
+<div class="dialog-wrapper">
+  <div class="job-title">{{ data.info.jobTitle }}</div>
+  <div class="header-wrapper">
+    <div class="location-wrapper">
+      <div class="job-company">{{ data.info.jobCompany }}</div>
+      <div class="job-location">{{ data.info.jobLocation }}</div>
+    </div>
+    <div class="date-wrapper">
+      <div class="job-dates">{{ data.info.jobDates }}</div>
+    </div>
   </div>
-</div> -->
 
-<!-- this is the dumb code -->
-<!-- <div class="card-container">
-  <div
-    class="card"
-    [ngClass]="{ flip: isFlipped }"
-    (click)="isFlipped = !isFlipped"
-  >
-    <mat-card class="front-card">
-      <p class="front-title">{{ jobs[0].jobTitle }}</p>
-      <div class="image-container">
-        <img [src]="jobs[0].image" alt="location specific patch" />
-      </div>
-      <p class="front-location">{{ jobs[0].jobLocation }}</p>
-    </mat-card>
-    <mat-card class="back-card">
-      <p class="back-title">Job Details:</p>
-      <p></p>
-    </mat-card>
+  <div class="job-details-wrapper" *ngFor="let detail of data.info.jobDetails">
+    <div class="job-duty">{{ detail.jobDuty }}</div>
+    <ul>
+      <li *ngFor="let item of detail.jobDetails">{{ item }}</li>
+    </ul>
   </div>
-</div> -->
-
-<p class="front-title">{{ data.info.jobTitle }}</p>
-<img [src]="data.info.image" alt="location specific patch" />
-<p class="front-location">{{ data.info.jobLocation }}</p>
+  <div mat-dialog-actions class="actions" align="end">
+    <button mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>

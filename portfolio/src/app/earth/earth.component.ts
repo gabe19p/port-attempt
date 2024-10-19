@@ -44,11 +44,11 @@ export class EarthComponent implements OnInit, AfterViewInit {
     this.getFresnelMat();
   }
 
-  openDialog(info: string): void {
+  openDialog(info: any): void {
+    console.log('Opening dialog with info:', info); // Add this line
     if (!this.dialogOpen) {
       // Check if the dialog is not already open
       this.dialogOpen = true; // Set flag to true when the dialog opens
-      console.log(info);
 
       // Declare dialogRef here
       const dialogRef = this.dialog.open(PinDialogComponent, {
@@ -95,7 +95,9 @@ export class EarthComponent implements OnInit, AfterViewInit {
       if (intersectedObject.name.startsWith('clickBox_')) {
         console.log('YOU DID IT!');
         const locationData = intersectedObject.userData; // Access userData from the click box
-        this.openDialog(locationData['info']); // Open the dialog with the specific info
+        console.log('On click log...');
+        console.log(locationData);
+        this.openDialog(locationData); // Open the dialog with the specific info
       }
     }
   }
@@ -314,8 +316,34 @@ export class EarthComponent implements OnInit, AfterViewInit {
         lat: 36.257,
         lon: 168,
         info: {
-          jobTitle: 'Knowledge Manager',
-          jobLocation: 'Omaha, Nebraska',
+          jobTitle: 'KNOWLEDGE MANAGER',
+          jobCompany: '55th Communications Squadron',
+          jobLocation: 'Offutt AFB - Omaha, Nebraska',
+          jobDates: '2017-2021',
+          jobDetails: [
+            {
+              jobDuty: 'SharePoint Admin',
+              jobDetails: [
+                'Project lead for development of COVID-19 tracking site and Airman promotion dashboard',
+                'Led monthly training for 200+ delegates on SharePoint best practices and security measures',
+                'Promoted organization process improvement techniques with collaboration management tools',
+              ],
+            },
+            {
+              jobDuty: 'Records Manager',
+              jobDetails: [
+                "Conducted quarterly audits to ensure compliance with record's disposition schedules",
+                'Managed data life-cycle; inventoried, destroyed and archived over 90,000 records',
+              ],
+            },
+            {
+              jobDuty: 'Cybersecurity Liaison',
+              jobDetails: [
+                'Administered AFNet domain access utilizing Information Assurance Officer (IAO) Express',
+                'JPAS experience verifying security clearance information and certification',
+              ],
+            },
+          ],
           image: 'assets/patches/55.png',
         },
       }, // Omaha
@@ -378,103 +406,4 @@ export class EarthComponent implements OnInit, AfterViewInit {
       this.earthGroup.add(sprite);
     });
   }
-
-  // map pins as read dots
-  // addMapPins(): void {
-  //   const locations = [
-  //     {
-  //       lat: 30.7416,
-  //       lon: 180,
-  //       info: {
-  //         jobTitle: 'IT Apprentice',
-  //         jobLocation: 'Biloxi, Mississippi',
-  //         image: 'assets/patches/336th.png',
-  //       },
-  //     }, // Mississippi
-  //     {
-  //       lat: 36.257,
-  //       lon: 171,
-  //       info: {
-  //         jobTitle: 'Knowledge Manager',
-  //         jobLocation: 'Omaha, Nebraska',
-  //         image: 'assets/patches/55th.jpg',
-  //       },
-  //     }, // Omaha
-  //     {
-  //       lat: 12,
-  //       lon: 310,
-  //       info: {
-  //         jobTitle: 'Executive Admin',
-  //         jobLocation: 'Djibouti, Africa',
-  //         image: 'assets/patches/449th.PNG',
-  //       },
-  //     }, // Djibouti
-  //     {
-  //       lat: 25,
-  //       lon: 398,
-  //       info: {
-  //         jobTitle: 'Data Operations Supervisor',
-  //         jobLocation: 'Okinawa, Japan',
-  //         image: 'assets/patches/390th.png',
-  //       },
-  //     }, // Okinawa
-  //   ];
-
-  //   locations.forEach((location, index) => {
-  //     const { lat, lon, info } = location;
-
-  //     // Convert latitude and longitude to radians
-  //     const latRad = THREE.MathUtils.degToRad(lat);
-  //     const lonRad = THREE.MathUtils.degToRad(lon);
-
-  //     // Calculate the position on the sphere
-  //     const radius = 1.04; // Adjust if needed based on the size of your Earth
-  //     const x = radius * Math.cos(latRad) * Math.sin(lonRad);
-  //     const y = radius * Math.sin(latRad);
-  //     const z = radius * Math.cos(latRad) * Math.cos(lonRad);
-
-  //     // Create the pin mesh and position it
-  //     const pinGeometry = new THREE.SphereGeometry(0.02, 16, 16);
-  //     const pinMaterial = new THREE.MeshBasicMaterial({ color: 0xf30000 });
-  //     const pin = new THREE.Mesh(pinGeometry, pinMaterial);
-  //     pin.name = `pin_${index}`; // Give the pin a unique name
-  //     pin.userData = { info }; // Attach info to userData
-
-  //     // Create a larger sphere for the clickable area
-  //     const clickBoxGeometry = new THREE.SphereGeometry(0.3, 16, 16); // Larger radius for the click box
-  //     const clickBoxMaterial = new THREE.MeshBasicMaterial({
-  //       color: 0x333333,
-  //       transparent: true,
-  //       opacity: 0,
-  //     }); // Invisible
-  //     const clickBox = new THREE.Mesh(clickBoxGeometry, clickBoxMaterial);
-  //     clickBox.position.set(x, y - 0.1, z);
-  //     clickBox.userData = { info }; // Attach the same info for dialog purposes
-  //     clickBox.name = `clickBox_${index}`; // Unique name for click box
-
-  //     // Create a larger sphere for the glow effect
-  //     const glowMaterial = new THREE.MeshBasicMaterial({
-  //       color: 0xff0000,
-  //       transparent: true,
-  //       opacity: 0.5, // Lower opacity for a softer glow
-  //     });
-  //     const glow1 = new THREE.Mesh(
-  //       new THREE.SphereGeometry(0.03, 16, 16), // Increase the segments for a smoother sphere
-  //       glowMaterial
-  //     );
-  //     const glow2 = new THREE.Mesh(
-  //       new THREE.SphereGeometry(0.04, 16, 16), // Increase the segments for a smoother sphere
-  //       glowMaterial
-  //     );
-
-  //     pin.position.set(x, y, z);
-  //     glow1.position.set(x, y, z);
-  //     glow2.position.set(x, y, z);
-
-  //     this.earthGroup.add(pin); // Add pin to the earthGroup
-  //     this.earthGroup.add(clickBox); // Add pin to the earthGroup
-  //     // this.earthGroup.add(glow1); // Add the glow behind the pin
-  //     this.earthGroup.add(glow2); // Add the glow behind the pin
-  //   });
-  // }
 }

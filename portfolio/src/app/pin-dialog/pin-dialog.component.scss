@@ -87,3 +87,61 @@
 // p {
 //   margin: 0;
 // }
+
+.dialog-wrapper {
+  background-color: black;
+  color: white;
+  font-family: "Poiret One", sans-serif !important;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 30px;
+  max-width: 450px;
+  gap: 5px;
+}
+
+.actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.header-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.date-wrapper {
+  align-self: center;
+}
+
+.job-title {
+  font-size: 32px;
+}
+
+.job-dates {
+  font-size: 14px;
+}
+
+.job-company {
+  font-size: 14px;
+}
+
+.job-location {
+  font-size: 14px;
+}
+
+.job-duty {
+  font-size: 18px;
+  font-family: "Outfit", sans-serif;
+}
+
+.job-duty-detail {
+  font-size: 14px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 200;
+}
+
+ul {
+  margin: 0;
+}
