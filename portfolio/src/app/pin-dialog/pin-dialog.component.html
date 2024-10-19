@@ -1,4 +1,9 @@
 <div class="dialog-wrapper">
+  <img
+    class="background-image"
+    [src]="data.info.image"
+    alt="location specific patch"
+  />
   <div class="job-title">{{ data.info.jobTitle }}</div>
   <div class="header-wrapper">
     <div class="location-wrapper">
@@ -9,7 +14,7 @@
       <div class="job-dates">{{ data.info.jobDates }}</div>
     </div>
   </div>
-
+  <br />
   <div class="job-details-wrapper" *ngFor="let detail of data.info.jobDetails">
     <div class="job-duty">{{ detail.jobDuty }}</div>
     <ul>

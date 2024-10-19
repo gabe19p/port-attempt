@@ -8,6 +8,7 @@
   padding: 30px;
   max-width: 450px;
   gap: 5px;
+  z-index: 1;
 }
 
 .actions {
@@ -22,11 +23,13 @@
 }
 
 .date-wrapper {
-  align-self: center;
+  align-self: flex-end;
 }
 
 .job-title {
   font-size: 32px;
+  word-spacing: 500px;
+  line-height: 1.01;
 }
 
 .job-dates {
@@ -54,4 +57,20 @@
 
 ul {
   margin: 0;
+}
+
+/* Styles for the background image */
+.background-image {
+  position: absolute; /* Position the image absolutely within the dialog */
+  top: 50%; /* Center the image vertically */
+  left: 50%; /* Center the image horizontally */
+  width: 100%; /* Make the image cover the dialog */
+  height: 100%; /* Make the image cover the dialog */
+  object-fit: cover; /* Ensure the image covers without distorting */
+  opacity: 0.08; /* Set the opacity to 5% */
+  transform: translate(
+    -50%,
+    -50%
+  ); /* Center the image by adjusting its position */
+  z-index: 0; /* Make sure it's behind the content */
 }
