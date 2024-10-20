@@ -53,9 +53,17 @@ path {
   width: 25px;
   height: 25px;
   margin: 10px;
+  transition: transform 200ms ease-in-out;
 }
 
 .category {
   height: 25px;
   margin: 10px;
+  cursor: pointer;
+  transition: transform 200ms ease-in-out;
+}
+
+.category:hover,
+.link:hover {
+  transform: scale(1.1);
 }

@@ -12,6 +12,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PinDialogComponent } from '../pin-dialog/pin-dialog.component';
 import { WorkInfo } from '../models/work-info';
 import { locations } from '../data/locations';
+import { EducationComponent } from '../education/education.component';
 
 @Component({
   selector: 'app-earth',
@@ -61,6 +62,18 @@ export class EarthComponent implements OnInit, AfterViewInit {
         panelClass: 'dialog-wrapper',
       });
 
+      // Reset dialogOpen to false when the dialog is closed
+      dialogRef.afterClosed().subscribe(() => {
+        this.dialogOpen = false; // Reset the flag
+      });
+    }
+  }
+
+  openEducationDialog() {
+    if (!this.dialogOpen) {
+      // Check if the dialog is not already open
+      this.dialogOpen = true; // change because open
+      const dialogRef = this.dialog.open(EducationComponent, {});
       // Reset dialogOpen to false when the dialog is closed
       dialogRef.afterClosed().subscribe(() => {
         this.dialogOpen = false; // Reset the flag
