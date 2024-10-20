@@ -11,6 +11,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PinDialogComponent } from '../pin-dialog/pin-dialog.component';
 import { WorkInfo } from '../models/work-info';
+import { locations } from '../data/locations';
 
 @Component({
   selector: 'app-earth',
@@ -31,13 +32,15 @@ export class EarthComponent implements OnInit, AfterViewInit {
   private lightsMesh!: THREE.Mesh;
   private cloudsMesh!: THREE.Mesh;
   private glowMesh!: THREE.Mesh;
-  private flashSpeed: number = 0.05; // Speed of the flashing
-  private maxFlashIntensity: number = 1.0; // Maximum color intensity
-  private minFlashIntensity: number = 0.3; // Minimum color intensity
-  private flashDirection: number = 1; // Direction of the intensity change
   private raycaster: THREE.Raycaster = new THREE.Raycaster();
   private mouse: THREE.Vector2 = new THREE.Vector2();
   private dialogOpen: boolean = false; // Flag to track dialog state
+
+  // Zoom parameters
+  private zoomDuration: number = 5; // Duration in seconds
+  private startTime: number | null = null; // To track the start time of the zoom
+  private initialCameraZ: number = 50; // Starting z position
+  private targetCameraZ: number = 2; // Target z position (close to Earth)
 
   constructor(private dialog: MatDialog) {
     this.getStarfield();
@@ -123,7 +126,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
       0.1,
       1000
     );
-    this.camera.position.z = 3;
+    this.camera.position.z = 50;
     this.camera.position.y = 1.5;
 
     // Area
@@ -131,8 +134,8 @@ export class EarthComponent implements OnInit, AfterViewInit {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     // Set min and max distance for zoom
-    this.controls.minDistance = 2; // Minimum distance to the globe
-    this.controls.maxDistance = 4; // Optional: Maximum distance from the globe
+    // this.controls.minDistance = 2;
+    // this.controls.maxDistance = 4;
 
     // Earth
     // Group
@@ -191,13 +194,40 @@ export class EarthComponent implements OnInit, AfterViewInit {
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
   }
 
+  startZoomAnimation(): void {
+    this.startTime = performance.now(); // Record the start time
+  }
+
   animate(): void {
     requestAnimationFrame(() => this.animate());
+
+    const currentTime = performance.now(); // Get the current time
+    if (this.startTime === null) {
+      this.startTime = currentTime; // Initialize start time on the first frame
+    }
+
+    const elapsedTime = (currentTime - this.startTime) / 1000; // Convert to seconds
+
+    // Check if the zooming should still be happening
+    if (elapsedTime < this.zoomDuration) {
+      // Calculate the new camera position using linear interpolation
+      const t = elapsedTime / this.zoomDuration;
+      this.camera.position.z =
+        this.initialCameraZ + t * (this.targetCameraZ - this.initialCameraZ);
+    } else {
+      // After zooming, set the camera position to the target
+      this.camera.position.z = this.targetCameraZ;
+
+      // Disable controls after the zoom is complete
+      // this.controls.enabled = false; // Disable controls
+      this.controls.minDistance = 2;
+      this.controls.maxDistance = 4;
+    }
 
     this.cloudsMesh.rotation.y += -0.001; // negative number to make clouds slower
     this.earthGroup.rotation.y += 0.002;
 
-    // Update controls
+    // Update controls (no longer needed since controls are disabled)
     this.controls.update();
 
     this.renderer.render(this.scene, this.camera);
@@ -303,71 +333,6 @@ export class EarthComponent implements OnInit, AfterViewInit {
 
   // map pins as patches & photos
   addMapPins(): void {
-    const locations = [
-      {
-        lat: 28.7416,
-        lon: 183,
-        info: {
-          jobTitle: 'IT Apprentice',
-          jobLocation: 'Biloxi, Mississippi',
-          image: 'assets/patches/336.png',
-        },
-      }, // Mississippi
-      {
-        lat: 36.257,
-        lon: 168,
-        info: {
-          jobTitle: 'Knowledge Manager',
-          jobCompany: '55th Communications Squadron',
-          jobLocation: 'Offutt AFB - Omaha, Nebraska',
-          jobDates: '2017-2021',
-          jobDetails: [
-            {
-              jobDuty: 'SharePoint Admin',
-              jobDetails: [
-                'Project lead for development of COVID-19 tracking site and Airman promotion dashboard',
-                'Led monthly training for 200+ delegates on SharePoint best practices and security measures',
-                'Promoted organization process improvement techniques with collaboration management tools',
-              ],
-            },
-            {
-              jobDuty: 'Records Manager',
-              jobDetails: [
-                "Conducted quarterly audits to ensure compliance with record's disposition schedules",
-                'Managed data life-cycle; inventoried, destroyed and archived over 90,000 records',
-              ],
-            },
-            {
-              jobDuty: 'Cybersecurity Liaison',
-              jobDetails: [
-                'Administered AFNet domain access utilizing Information Assurance Officer (IAO) Express',
-                'JPAS experience verifying security clearance information and certification',
-              ],
-            },
-          ],
-          image: 'assets/patches/55.png',
-        },
-      }, // Omaha
-      {
-        lat: 12,
-        lon: 310,
-        info: {
-          jobTitle: 'Executive Admin',
-          jobLocation: 'Djibouti, Africa',
-          image: 'assets/patches/449.png',
-        },
-      }, // Djibouti
-      {
-        lat: 25,
-        lon: 398,
-        info: {
-          jobTitle: 'Data Operations Supervisor',
-          jobLocation: 'Okinawa, Japan',
-          image: 'assets/patches/390.png',
-        },
-      }, // Okinawa
-    ];
-
     locations.forEach((location, index) => {
       const { lat, lon, info } = location;
 
