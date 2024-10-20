@@ -9,5 +9,6 @@ export interface WorkInfo {
   jobLocation: string;
   jobDates: string;
   jobDetails: JobDetail[];
+  jobSkills: string[];
   image: string;
 }

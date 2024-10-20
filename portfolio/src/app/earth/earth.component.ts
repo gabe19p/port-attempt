@@ -36,11 +36,13 @@ export class EarthComponent implements OnInit, AfterViewInit {
   private mouse: THREE.Vector2 = new THREE.Vector2();
   private dialogOpen: boolean = false; // Flag to track dialog state
 
-  // Zoom parameters
+  // Zoom on-load parameters
   private zoomDuration: number = 5; // Duration in seconds
   private startTime: number | null = null; // To track the start time of the zoom
-  private initialCameraZ: number = 50; // Starting z position
+  private initialCameraZ: number = 25; // Starting z position
   private targetCameraZ: number = 2; // Target z position (close to Earth)
+
+  isVisible = false;
 
   constructor(private dialog: MatDialog) {
     this.getStarfield();
@@ -68,6 +70,10 @@ export class EarthComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     window.addEventListener('click', (event) => this.onClick(event));
+    // Wait for 5 seconds before showing the element
+    setTimeout(() => {
+      this.isVisible = true;
+    }, 3000); // 5000 milliseconds = 5 seconds
   }
 
   ngAfterViewInit(): void {
@@ -126,16 +132,13 @@ export class EarthComponent implements OnInit, AfterViewInit {
       0.1,
       1000
     );
-    this.camera.position.z = 50;
-    this.camera.position.y = 1.5;
+    this.camera.position.z = 20;
+    this.camera.position.y = 1;
 
     // Area
     // Controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
-    // Set min and max distance for zoom
-    // this.controls.minDistance = 2;
-    // this.controls.maxDistance = 4;
 
     // Earth
     // Group
@@ -150,7 +153,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
       map: loader.load('assets/textures/8081_earthmap10k.jpg'),
       specularMap: loader.load('assets/textures/8081_earthspec10k.jpg'),
       bumpMap: loader.load('assets/textures/8081_earthbump10k.jpg'),
-      bumpScale: 50,
+      bumpScale: 1000,
     });
     this.earthMesh = new THREE.Mesh(geometry, earthMat);
     this.earthGroup.add(this.earthMesh);
@@ -221,7 +224,7 @@ export class EarthComponent implements OnInit, AfterViewInit {
       // Disable controls after the zoom is complete
       // this.controls.enabled = false; // Disable controls
       this.controls.minDistance = 2;
-      this.controls.maxDistance = 4;
+      this.controls.maxDistance = 3;
     }
 
     this.cloudsMesh.rotation.y += -0.001; // negative number to make clouds slower

@@ -5,6 +5,8 @@
     alt="location specific patch"
   />
   <div class="job-title">{{ data.info.jobTitle }}</div>
+  <br />
+  <!-- job location and dates -->
   <div class="header-wrapper">
     <div class="location-wrapper">
       <div class="job-company">{{ data.info.jobCompany }}</div>
@@ -15,11 +17,22 @@
     </div>
   </div>
   <br />
+  <!-- job details & duties -->
   <div class="job-details-wrapper" *ngFor="let detail of data.info.jobDetails">
     <div class="job-duty">{{ detail.jobDuty }}</div>
     <ul>
       <li *ngFor="let item of detail.jobDetails">{{ item }}</li>
     </ul>
+  </div>
+  <br />
+  <!-- job skills -->
+  <div class="skill-wrapper">
+    <div class="skill-title">soft skills</div>
+    <div class="skill-row">
+      <div class="skill-container" *ngFor="let skill of data.info.jobSkills">
+        <button mat-stroked-button>{{ skill }}</button>
+      </div>
+    </div>
   </div>
   <div mat-dialog-actions class="actions" align="end">
     <button mat-icon-button (click)="closeDialog()">
@@ -27,3 +40,53 @@
     </button>
   </div>
 </div>
+
+<!-- <div class="dialog-wrapper">
+  <div class="job-title">Job Title</div>
+  <br />
+  <div class="header-wrapper">
+    <div class="location-wrapper">
+      <div class="job-company">Job Company</div>
+      <div class="job-location">Job Location</div>
+    </div>
+    <div class="date-wrapper">
+      <div class="job-dates">date - date</div>
+    </div>
+  </div>
+  <br />
+  <div class="job-details-wrapper">
+    <div class="job-duty">job duty</div>
+    <ul>
+      <li>laksjdf;lkasjdkf;laskdjflkas;d</li>
+      <li>laksjdf;lkasjdkf;laskdjflkas;d</li>
+    </ul>
+    <div class="job-duty">job duty</div>
+    <ul>
+      <li>laksjdf;lkasjdkf;laskdjflkas;d</li>
+      <li>laksjdf;lkasjdkf;laskdjflkas;d</li>
+    </ul>
+    <div class="job-duty">job duty</div>
+    <ul>
+      <li>laksjdf;lkasjdkf;laskdjflkas;d</li>
+      <li>laksjdf;lkasjdkf;laskdjflkas;d</li>
+    </ul>
+  </div>
+  <br />
+  <div class="skill-wrapper">
+    <div class="skill-row">
+      <div class="skill-container">
+        <button mat-stroked-button>random skill</button>
+      </div>
+      <div class="skill-container">
+        <button mat-stroked-button>random skill</button>
+      </div>
+      <div class="skill-container">
+        <button mat-stroked-button>random skill</button>
+      </div>
+      <div class="skill-container">
+        <button mat-stroked-button>random skill</button>
+      </div>
+    </div>
+  </div>
+  <div mat-dialog-actions class="actions" align="end"></div>
+</div> -->

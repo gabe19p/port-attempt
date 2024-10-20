@@ -7,7 +7,6 @@
   position: relative;
   padding: 30px;
   max-width: 450px;
-  gap: 5px;
   z-index: 1;
 }
 
@@ -57,6 +56,8 @@
 
 ul {
   margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-weight: 200;
 }
 
 /* Styles for the background image */
@@ -73,4 +74,26 @@ ul {
     -50%
   ); /* Center the image by adjusting its position */
   z-index: 0; /* Make sure it's behind the content */
+}
+
+button {
+  color: white !important;
+  font-family: "Poiret One", sans-serif !important;
+  white-space: nowrap !important;
+  height: 30px;
+}
+
+.skill-title {
+  text-align: center;
+  width: 100%;
+  font-family: "Poiret One", sans-serif !important;
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.skill-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 10px 0;
 }
